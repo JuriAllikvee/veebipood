@@ -93,26 +93,22 @@ Rakenduses olid järgmised vead, mis on nüüd edukalt lahendatud:
 ## Arhitektuur
 
 ### 1. Mis arhitektuur see rakendus kasutab?
-Rakendus kasutab **klient-server (Client-Server)** ja **monoliitset (Monolithic) arhitektuuri**. Nii frontend (Vanilla JS/HTML/CSS) kui ka backend (API server) on pakendatud ühte projekti ning käitatakse koos ühe Node.js/Docker konteineri teenusena.
+Rakendus kasutab **monoliitset klient-server** arhitektuuri. Nii kasutajaliides (frontend) kui ka server (backend) on ühes koodibaasis ja töötavad ühes protsessis.
 
 ### 2. Millest sa seda järeldad?
-- **Koodi struktuur:** Kogu rakenduse kood (ruuterid, server, äriloogika ja staatilised frontendi failid `public/` kaustas) asub ühes repositooriumis ja töötab ühes ja samas protsessis.
-- **Andmete jagamine:** Andmeid hoitakse otse serveri protsessi mälus (`src/data.js` moodulis). Puudub eraldiseisev andmebaasisüsteem või mikroteenuste vaheline API-suhtlus.
-- **Käivitamine:** Kogu rakendus pannakse korraga käima ühe failiga (`src/server.js`) ja selle saab tervikuna pakkida ühte Docker-pilti.
+- **Koodi struktuur:** Kogu kood (server, marsruudid, staatilised failid) on ühes kohas ja käivitub korraga ühe käsuga.
+- **Andmete jagamine:** Andmeid hoitakse otse serveri mälus (`data.js` failis). Puudub eraldi andmebaas või muud teenused.
+- **Käivitamine:** Kogu rakendus töötab üheainsa Node.js protsessina ja seda saab tervikuna pakkida ühte Docker konteinerisse.
 
 ### 3. Miks see arhitektuur on siin õige valik?
-Tegemist on väikese ja lihtsa näidisrakendusega. Monoliitne arhitektuur on antud juhul parim valik, kuna:
-- **Lihtne arendus ja testimine:** Kogu kood on ühes kohas, seda on lihtne kohapeal käivitada ja testida ilma keerukate võrgu- või infrastruktuurikonfiguratsioonideta.
-- **Kiirus:** Puudub vajadus suhelda erinevate mikroteenuste vahel üle võrgu, mis vähendab latency-t ja arendusaega.
-- **Väike keerukus:** Ei vaja Kubernetes'i, teenuste avastamist (service discovery) ega keerulist CI/CD konfigureerimist.
+Sest see on väike ja lihtne näidisrakendus. Monoliiti on ülimalt lihtne lokaalselt arendada, käivitada ja testida ilma keerulise infrastruktuurita.
 
 ### 4. Mis arhitektuuri kasutaksid kui rakendus peaks teenindama 1 miljonit kasutajat?
-Sellisel juhul tuleks liikuda **hajutatud mikroteenuste (Distributed Microservices)** arhitektuurile:
-1. **Teenuste lahutamine:** Jagada monoliit eraldi teenusteks (nt *Autentimisteenus*, *Tootekataloog*, *Tellimuste ja maksete teenus*, *Teavitusteenus*), et neid saaks skaleerida sõltumatult.
-2. **Andmebaaside lahutamine:** Igal mikroteenusel oleks oma andmebaas (nt toodetele kiire lugejasõbralik NoSQL/MongoDB ja tellimustele range ACID-tugi SQL/PostgreSQL näol). Andmebaasid oleksid replikeeritud (Master-Slave struktuuris).
-3. **Koormusjaotus (Load Balancing) & API Gateway:** Kasutada API Gateway-d (nt Nginx või AWS API Gateway) ja koormusjaotureid, et suunata päringud dünaamiliselt mitmele serveri instantsile (Kubernetes pod-ile).
-4. **Vahemälu (Caching) & CDN:** Kasutada Redis't tooteinfo ja sessioonide vahemäluks ning CDN-i (Cloudflare, AWS CloudFront) staatilise sisu serveerimiseks, et säästa serveri ressursse.
-5. **Asünkroonne sõnumside:** Kasutada sõnumijärjekordi (Message Broker, nt RabbitMQ või Apache Kafka) pikemate asünkroonsete toimingute (nt meili saatmine või makse kinnitamine) tegemiseks ilma põhilõime blokeerimata.
+Kasutaksin **mikroteenuste (Microservices)** arhitektuuri:
+- **Teenuste jagamine:** Tükeldaksin monoliidi eraldi mikroteenusteks (kasutajad, tooted, tellimused), et neid saaks eraldi skaleerida.
+- **Eraldi andmebaasid:** Igale teenusele oma andmebaas (nt PostgreSQL või MongoDB) koos replikatsiooniga.
+- **Koormuse jaotamine:** Lisaksin koormusjaoturi (Load Balancer) ja vahemälud (Redis), et päringuid kiirendada.
+- **CDN:** Staatilise sisu serveerimiseks kasutaksin CDN-i.
 
 ## GitHub Actions
 
