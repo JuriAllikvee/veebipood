@@ -140,8 +140,6 @@ veebipood/
 ├── patches/                         # Automaatsed muudatusskriptid
 ├── docker-compose.monolith.yml
 ├── docker-compose.microservices.yml
-├── MONOLIIT.md                      ← Monoliidi juhend
-└── MIKROTEENUSED.md                 ← Mikroteenuste juhend
 ```
 
 ### Pordid ja aadressid
