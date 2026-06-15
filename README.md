@@ -121,3 +121,37 @@ Workflow teeb automaatselt järgmist:
 4. Käivitab veebiserveri taustal (`node src/server.js &`).
 5. Ootab 3 sekundit, et server jõuaks käivituda.
 6. Käivitab testid (`node src/test.js`), et veenduda uute muudatuste korrektsuses enne nende ühendamist toodangusse.
+
+## Monoliidilt mikroteenustele üleminek
+
+Monoliitse rakenduse tükeldamiseks mikroteenusteks jaotatakse funktsionaalsus iseseisvateks teenusteks, mis töötavad eraldi pordil ja suhtlevad läbi API Gateway.
+
+### Projekti struktuur pärast üleminekut
+
+```text
+veebipood/
+├── monolith/                        # Monoliit — kõik ühes rakenduses
+├── microservices/                   # Mikroteenused — eraldi teenused
+│   ├── users/                       # Kasutajate teenus (port 5051)
+│   ├── products/                    # Toodete teenus (port 5052)
+│   ├── orders/                      # Tellimuste teenus (port 5053)
+│   ├── reviews/                     # Arvustuste teenus (port 5054)
+│   └── gateway/                     # Veebileht ja sisend (port 5070)
+├── patches/                         # Automaatsed muudatusskriptid
+├── docker-compose.monolith.yml
+├── docker-compose.microservices.yml
+├── MONOLIIT.md                      ← Monoliidi juhend
+└── MIKROTEENUSED.md                 ← Mikroteenuste juhend
+```
+
+### Pordid ja aadressid
+
+| Rakendus | Port | Aadress |
+|---|---|---|
+| Monoliit | 5050 | http://localhost:5050 |
+| Gateway (mikroteenused) | 5070 | http://localhost:5070 |
+| Kasutajate teenus | 5051 | http://localhost:5051 |
+| Toodete teenus | 5052 | http://localhost:5052 |
+| Tellimuste teenus | 5053 | http://localhost:5053 |
+| Arvustuste teenus | 5054 | http://localhost:5054 |
+
